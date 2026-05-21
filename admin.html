@@ -247,6 +247,7 @@
       </div>
       <div id="gh-connected" style="display:none" class="gh-connected">
         <span>✅ Connected to GitHub</span>
+        <button class="gh-clear-btn" onclick="copyToken()">Copy Token</button>
         <button class="gh-clear-btn" onclick="clearToken()">Disconnect</button>
       </div>
     </div>
@@ -375,6 +376,12 @@
       if (!val) { alert("Please paste your token first."); return; }
       localStorage.setItem(TOKEN_KEY, val);
       updateTokenUI();
+    }
+
+    function copyToken() {
+      const t = getToken();
+      if (!t) return;
+      navigator.clipboard.writeText(t).then(() => alert("Token copied! Paste it into Notes on your phone for safekeeping."));
     }
 
     function clearToken() {
