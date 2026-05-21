@@ -467,7 +467,7 @@
         { headers: ghHeaders() });
       if (!res.ok) throw new Error(`GitHub error ${res.status}: ${(await res.json()).message}`);
       const data = await res.json();
-      return { sha: data.sha, entries: JSON.parse(b64decode(data.content)) };
+      return { sha: data.sha, entries: JSON.parse(b64decode(data.content)).entries || [] };
     }
 
     async function ghSaveEntriesJson(entries, sha) {
