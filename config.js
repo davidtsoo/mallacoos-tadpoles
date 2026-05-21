@@ -14,7 +14,7 @@ const CONFIG = {
   },
 
   // ── Farm info ───────────────────────────────────────────────
-  farmName:  "Bay Innovation Farm",
+  farmName:  "Mallacoos Farm",
   pondName:  "The Learning Pond",
   location:  "Stevensville, Maryland",
   season:    "Spring 2026",
