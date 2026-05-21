@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tadpole Tracker — Bay Innovation Farm</title>
+  <meta name="description" content="Watching tadpoles become frogs at Bay Innovation Farm in Stevensville, Maryland.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="status-banner" class="status-banner"></div>
+
+  <header class="site-header">
+    <span class="frog-icon">🐸</span>
+    <h1>Tadpole Tracker</h1>
+    <p class="subtitle">
+      <span class="farm-name">Bay Innovation Farm</span>
+      &nbsp;·&nbsp;
+      <span class="location-name">Stevensville, MD</span>
+      &nbsp;·&nbsp;
+      <span class="season-name">Spring 2026</span>
+    </p>
+  </header>
+
+  <nav>
+    <a href="index.html" class="active">📓 Journal</a>
+    <a href="learn.html">📚 Learn</a>
+    <a href="admin.html">✏️ New Entry</a>
+  </nav>
+
+  <main class="container">
+
+    <!-- Stats row -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <span class="stat-value" id="stat-days">—</span>
+        <span class="stat-label">Days Tracked</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="stat-entries">—</span>
+        <span class="stat-label">Log Entries</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="stat-stage">—</span>
+        <span class="stat-label">Current Stage</span>
+      </div>
+    </div>
+
+    <!-- Stage progress track -->
+    <div class="current-stage-card">
+      <div class="current-stage-label">Development Progress</div>
+      <div class="stage-track" id="stage-track">
+        <!-- Filled in by app.js -->
+      </div>
+    </div>
+
+    <!-- Journal entries -->
+    <div class="entries-header">
+      <h2>📓 Field Journal</h2>
+      <span class="entry-count" id="entry-count"></span>
+    </div>
+
+    <div id="entries-list">
+      <!-- Filled in by app.js -->
+    </div>
+
+  </main>
+
+  <footer>
+    <p>🐸 <span class="farm-name">Bay Innovation Farm</span> · <span class="location-name">Stevensville, Maryland</span></p>
+    <p>Documenting the wonders of nature, one tadpole at a time.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

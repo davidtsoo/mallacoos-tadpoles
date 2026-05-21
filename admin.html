@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Entry — Tadpole Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .composer {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 1.5rem; margin-bottom: 1.25rem;
+    }
+    .composer-header {
+      display: flex; align-items: center; gap: 0.85rem;
+      margin-bottom: 1.4rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+    }
+    .composer-avatar {
+      width: 50px; height: 50px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+    .composer-who   { font-weight: 800; font-size: 1rem; color: var(--green-dark); }
+    .composer-sub   { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* ── GitHub connection ── */
+    .gh-connect {
+      background: #f3f4f6; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1rem 1.1rem; margin-bottom: 1.2rem;
+    }
+    .gh-connect-title { font-weight: 800; font-size: 0.85rem; color: var(--text-dark); margin-bottom: 0.35rem; }
+    .gh-connect-desc  { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.65rem; line-height: 1.5; }
+    .gh-token-row { display: flex; gap: 0.5rem; }
+    .gh-token-input {
+      flex: 1; padding: 0.55rem 0.8rem;
+      border: 2px solid var(--border); border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 0.88rem; outline: none;
+      transition: border-color 0.18s; background: white;
+    }
+    .gh-token-input:focus { border-color: var(--green-mid); }
+    .gh-save-btn {
+      padding: 0.55rem 1rem; background: var(--green-dark); color: white;
+      border: none; border-radius: var(--radius-sm); font-family: inherit;
+      font-size: 0.88rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .gh-save-btn:hover { background: #1a3d2b; }
+    .gh-connected {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      font-size: 0.85rem; color: var(--green-dark); font-weight: 700;
+    }
+    .gh-clear-btn {
+      background: none; border: 1.5px solid var(--border); color: var(--text-muted);
+      padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.78rem;
+      font-weight: 700; cursor: pointer; font-family: inherit;
+    }
+    .gh-clear-btn:hover { border-color: #e53935; color: #e53935; }
+
+    /* ── Edit mode banner ── */
+    .edit-banner {
+      background: #fff8e1; border: 1.5px solid #ffe082; border-radius: var(--radius-sm);
+      padding: 0.7rem 1rem; margin-bottom: 1.2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+      font-size: 0.88rem; font-weight: 700; color: #795548;
+    }
+    .cancel-edit-btn {
+      background: none; border: 1.5px solid #ffe082; color: #795548;
+      padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.8rem;
+      font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap;
+    }
+    .cancel-edit-btn:hover { background: #fff3cd; }
+
+    /* ── Fields ── */
+    .field-group { margin-bottom: 1.2rem; }
+    .field-label {
+      display: block; font-size: 0.75rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.45rem;
+    }
+    .field-date, .field-notes {
+      width: 100%; padding: 0.7rem 0.95rem;
+      border: 2px solid var(--border); border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 1rem; color: var(--text-dark);
+      background: var(--bg); outline: none; transition: border-color 0.18s;
+    }
+    .field-date:focus, .field-notes:focus { border-color: var(--green-mid); }
+    .field-date { font-weight: 700; }
+    .field-notes { min-height: 130px; resize: vertical; line-height: 1.65; }
+
+    /* ── Stage picker ── */
+    .stage-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+    .stage-option {
+      border: 2px solid var(--border); border-radius: var(--radius-sm);
+      padding: 0.65rem 0.4rem; text-align: center; cursor: pointer;
+      background: var(--bg); transition: all 0.15s; user-select: none;
+    }
+    .stage-option:hover    { border-color: var(--green-mid); background: var(--green-light); }
+    .stage-option.selected {
+      border-color: var(--green-dark); background: var(--green-light);
+      box-shadow: 0 0 0 3px rgba(82,183,136,0.25);
+    }
+    .stage-option .s-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.2rem; }
+    .stage-option .s-name  { font-size: 0.72rem; font-weight: 800; color: var(--green-dark); }
+
+    /* ── Photo upload ── */
+    .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .upload-slot {
+      aspect-ratio: 4/3; border: 2px dashed var(--border); border-radius: var(--radius-sm);
+      background: var(--bg); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; cursor: pointer;
+      position: relative; overflow: hidden; transition: all 0.18s;
+    }
+    .upload-slot:hover  { border-color: var(--green-mid); background: var(--green-light); }
+    .upload-slot.filled { border-style: solid; border-color: var(--green-mid); }
+    .upload-slot img    { width:100%; height:100%; object-fit:cover; display:block; }
+    .slot-hint  { font-size: 1.6rem; pointer-events: none; }
+    .slot-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); pointer-events: none; }
+    .slot-remove {
+      position: absolute; top: 0.35rem; right: 0.35rem;
+      width: 26px; height: 26px; background: rgba(0,0,0,0.55);
+      color: white; border: none; border-radius: 50%; font-size: 0.85rem;
+      cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 5;
+    }
+    .upload-slot.filled .slot-remove { display: flex; }
+
+    /* ── AI coach ── */
+    .ai-coach {
+      background: linear-gradient(135deg,#f0f4ff 0%,#e8f5e9 100%);
+      border: 1px solid #c5cae9; border-radius: var(--radius-sm); padding: 1rem 1.1rem;
+    }
+    .ai-coach-title { font-size: 0.82rem; font-weight: 800; color: #3c3594; margin-bottom: 0.35rem; }
+    .ai-coach-desc  { font-size: 0.82rem; color: var(--text-mid); margin-bottom: 0.7rem; line-height: 1.5; }
+    .ai-btn {
+      background: #5c35d6; color: white; border: none; border-radius: var(--radius-sm);
+      padding: 0.6rem 1.15rem; font-family: inherit; font-size: 0.9rem; font-weight: 800; cursor: pointer;
+    }
+    .ai-btn:hover { background: #4929b5; }
+    .ai-tip {
+      margin-top: 0.85rem; background: white; border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem; border: 1px solid #c5cae9;
+    }
+    .ai-tip p { font-size: 0.85rem; color: var(--text-mid); margin-bottom: 0.65rem; line-height: 1.55; }
+    .ai-tip-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .ai-open-btn {
+      background: #5c35d6; color: white; text-decoration: none; padding: 0.45rem 1rem;
+      border-radius: 999px; font-size: 0.82rem; font-weight: 800; display: inline-block;
+    }
+    .ai-open-btn:hover { background: #4929b5; }
+    .ai-copy-btn {
+      background: none; border: 2px solid var(--border); color: var(--text-mid);
+      padding: 0.4rem 0.9rem; border-radius: 999px; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+    }
+    .ai-copy-btn:hover { border-color: #5c35d6; color: #5c35d6; }
+
+    /* ── Publish button ── */
+    .publish-btn {
+      width: 100%; padding: 0.95rem; background: var(--green-dark); color: white;
+      border: none; border-radius: var(--radius-sm); font-family: inherit;
+      font-size: 1.05rem; font-weight: 800; cursor: pointer; transition: background 0.18s, transform 0.1s;
+      margin-top: 0.25rem;
+    }
+    .publish-btn:hover    { background: #1a3d2b; }
+    .publish-btn:active   { transform: scale(0.99); }
+    .publish-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ── Progress bar (during upload) ── */
+    .upload-progress {
+      display: none; background: var(--green-light);
+      border-radius: var(--radius-sm); padding: 0.75rem 1rem;
+      margin-top: 0.75rem; font-size: 0.88rem; font-weight: 700;
+      color: var(--green-dark); text-align: center;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      display: none; background: var(--green-dark); color: white;
+      border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+      font-weight: 700; font-size: 0.95rem; text-align: center;
+      animation: slideDown 0.3s ease;
+    }
+    .toast a { color: #b7e4c7; }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:none; } }
+
+    /* ── Past entries ── */
+    .past-header { font-size: 1.1rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.85rem; }
+    .admin-entry {
+      background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 1rem 1.25rem; margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .admin-entry-thumbs { display: flex; gap: 4px; flex-shrink: 0; }
+    .admin-thumb        { width: 42px; height: 42px; border-radius: 6px; object-fit: cover; }
+    .admin-thumb-empty  {
+      width: 42px; height: 42px; border-radius: 6px; background: var(--bg);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-muted);
+    }
+    .admin-entry-body { flex: 1; min-width: 0; }
+    .admin-entry-date { font-weight: 800; font-size: 0.95rem; }
+    .admin-entry-note { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .edit-btn {
+      background: none; border: none; font-size: 1.1rem; cursor: pointer;
+      opacity: 0.45; transition: opacity 0.18s; flex-shrink: 0; padding: 0.25rem;
+    }
+    .edit-btn:hover { opacity: 1; }
+    .del-btn {
+      background: none; border: none; font-size: 1.1rem; cursor: pointer;
+      opacity: 0.4; transition: opacity 0.18s; flex-shrink: 0; padding: 0.25rem;
+    }
+    .del-btn:hover { opacity: 1; }
+
+    @media (max-width: 480px) { .stage-picker { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <span class="frog-icon">🐸</span>
+    <h1>Tadpole Tracker</h1>
+    <p class="subtitle"><span class="farm-name">Bay Innovation Farm</span> · <span class="season-name">Spring 2026</span></p>
+  </header>
+
+  <nav>
+    <a href="index.html">📓 Journal</a>
+    <a href="learn.html">📚 Learn</a>
+    <a href="admin.html" class="active">✏️ New Entry</a>
+  </nav>
+
+  <main class="container">
+
+    <div id="toast" class="toast"></div>
+
+    <!-- ── GitHub connection ──────────────────────────────────── -->
+    <div class="composer" id="gh-section">
+      <div id="gh-not-connected">
+        <div class="gh-connect-title">🔑 Connect to GitHub to publish entries</div>
+        <div class="gh-connect-desc">
+          Paste your GitHub Personal Access Token below. This is a one-time setup.
+          Your token is stored only on this device.<br>
+          <strong>Don't have one yet?</strong> See <strong>SETUP.md</strong> for step-by-step instructions.
+        </div>
+        <div class="gh-token-row">
+          <input class="gh-token-input" type="password" id="gh-token-input"
+                 placeholder="ghp_xxxxxxxxxxxx">
+          <button class="gh-save-btn" onclick="saveToken()">Connect</button>
+        </div>
+      </div>
+      <div id="gh-connected" style="display:none" class="gh-connected">
+        <span>✅ Connected to GitHub</span>
+        <button class="gh-clear-btn" onclick="clearToken()">Disconnect</button>
+      </div>
+    </div>
+
+    <!-- ── Composer ───────────────────────────────────────────── -->
+    <div class="composer">
+
+      <div class="composer-header">
+        <div class="composer-avatar">🐸</div>
+        <div>
+          <div class="composer-who farm-name">Bay Innovation Farm</div>
+          <div class="composer-sub">What happened at the pond today?</div>
+        </div>
+      </div>
+
+      <div id="edit-banner" class="edit-banner" style="display:none">
+        <span>✏️ Editing an existing entry</span>
+        <button type="button" class="cancel-edit-btn" onclick="cancelEdit()">✕ Cancel, start new entry</button>
+      </div>
+
+      <form id="entry-form" novalidate>
+
+        <div class="field-group">
+          <label class="field-label" for="f-date">Date</label>
+          <input class="field-date" type="date" id="f-date" required>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Development Stage</label>
+          <div class="stage-picker" id="stage-picker"></div>
+          <input type="hidden" id="f-stage" value="no-legs">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="f-notes">Your Observations</label>
+          <textarea class="field-notes" id="f-notes"
+            placeholder="What did you see today? How were the tadpoles behaving? Any changes since last time?"></textarea>
+        </div>
+
+        <div class="field-group">
+          <div class="ai-coach">
+            <div class="ai-coach-title">✨ AI Writing Coach</div>
+            <div class="ai-coach-desc">Write a draft above, then get feedback and ideas from Claude AI.</div>
+            <button type="button" class="ai-btn" onclick="getWritingHelp()">✨ Get Writing Help</button>
+            <div class="ai-tip" id="ai-tip" style="display:none">
+              <p>Your prompt has been copied and Claude has opened in a new tab.<br>
+                 Just <strong>paste it in</strong> (Cmd+V on Mac, Ctrl+V on Windows)!</p>
+              <div class="ai-tip-actions">
+                <a href="https://claude.ai" target="_blank" rel="noopener" class="ai-open-btn">Open Claude again →</a>
+                <button type="button" class="ai-copy-btn" onclick="copyAIPrompt()">Copy prompt again</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Photos</label>
+          <div class="upload-grid" id="upload-grid"></div>
+          <input type="file" id="photo-file-input"
+                 accept="image/*,image/heic,image/heif" multiple
+                 style="display:none" onchange="handlePhotoFiles(event)">
+        </div>
+
+        <button type="submit" class="publish-btn" id="publish-btn">🐸 Publish Entry</button>
+        <div class="upload-progress" id="upload-progress"></div>
+
+      </form>
+    </div>
+
+    <!-- ── Past entries ───────────────────────────────────────── -->
+    <div class="past-header" id="past-header" style="display:none">Published Entries</div>
+    <div id="admin-entries-list"></div>
+
+  </main>
+
+  <footer>
+    <p>🐸 <span class="farm-name">Bay Innovation Farm</span> · <span class="location-name">Stevensville, Maryland</span></p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script>
+    // ── Fill farm info ────────────────────────────────────────
+    document.querySelectorAll(".farm-name").forEach(el => el.textContent = CONFIG.farmName);
+    document.querySelectorAll(".season-name").forEach(el => el.textContent = CONFIG.season);
+    document.querySelectorAll(".location-name").forEach(el => el.textContent = CONFIG.location);
+
+    // ── Stages ────────────────────────────────────────────────
+    const ADMIN_STAGES = [
+      { key:"no-legs",    emoji:"🐟", label:"No Legs"    },
+      { key:"back-legs",  emoji:"🦵", label:"Back Legs"  },
+      { key:"front-legs", emoji:"🤲", label:"Front Legs" },
+      { key:"froglet",    emoji:"🐸", label:"Froglet"    },
+      { key:"released",   emoji:"🌿", label:"Released!"  },
+      { key:"egg",        emoji:"🥚", label:"Egg"        },
+    ];
+    const STAGE_LABELS = Object.fromEntries(ADMIN_STAGES.map(s => [s.key, s.emoji+" "+s.label]));
+
+    let selectedStage = "no-legs";
+    let editingId     = null;
+
+    function buildStagePicker() {
+      document.getElementById("stage-picker").innerHTML = ADMIN_STAGES.map(s => `
+        <div class="stage-option${s.key==="no-legs"?" selected":""}" data-key="${s.key}"
+             onclick="pickStage('${s.key}')">
+          <span class="s-emoji">${s.emoji}</span>
+          <span class="s-name">${s.label}</span>
+        </div>`).join("");
+    }
+
+    function pickStage(key) {
+      selectedStage = key;
+      document.getElementById("f-stage").value = key;
+      document.querySelectorAll(".stage-option").forEach(el =>
+        el.classList.toggle("selected", el.dataset.key === key));
+    }
+
+    document.getElementById("f-date").value = new Date().toISOString().split("T")[0];
+
+    // ── GitHub token management ───────────────────────────────
+    const TOKEN_KEY = "gh_pat";
+
+    function getToken()  { return localStorage.getItem(TOKEN_KEY) || ""; }
+
+    function saveToken() {
+      const val = document.getElementById("gh-token-input").value.trim();
+      if (!val) { alert("Please paste your token first."); return; }
+      localStorage.setItem(TOKEN_KEY, val);
+      updateTokenUI();
+    }
+
+    function clearToken() {
+      if (!confirm("Disconnect from GitHub? You'll need to re-enter your token to publish.")) return;
+      localStorage.removeItem(TOKEN_KEY);
+      updateTokenUI();
+    }
+
+    function updateTokenUI() {
+      const hasToken = !!getToken();
+      document.getElementById("gh-not-connected").style.display = hasToken ? "none"  : "block";
+      document.getElementById("gh-connected").style.display      = hasToken ? "flex"  : "none";
+    }
+
+    // ── Photos ────────────────────────────────────────────────
+    // Each element is either a dataURL (new upload) or a https:// URL (existing GitHub photo)
+    const photos = [];
+
+    async function compressPhoto(file) {
+      return new Promise(resolve => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          const maxW  = 1200;
+          const scale = Math.min(1, maxW / img.width);
+          const c = document.createElement("canvas");
+          c.width  = Math.round(img.width  * scale);
+          c.height = Math.round(img.height * scale);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          resolve(c.toDataURL("image/jpeg", 0.78));
+        };
+        img.src = url;
+      });
+    }
+
+    function buildUploadGrid() {
+      document.getElementById("upload-grid").innerHTML = [
+        ...photos.map((p, i) => `
+          <div class="upload-slot filled">
+            <img src="${p}" alt="Photo ${i+1}">
+            <button type="button" class="slot-remove" onclick="removePhoto(event,${i})">✕</button>
+          </div>`),
+        `<div class="upload-slot" onclick="document.getElementById('photo-file-input').click()">
+          <span class="slot-hint">📷</span>
+          <span class="slot-label">Add photo</span>
+        </div>`,
+      ].join("");
+    }
+
+    async function handlePhotoFiles(e) {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+      const grid = document.getElementById("upload-grid");
+      grid.insertAdjacentHTML("beforeend",
+        files.map(() => `<div class="upload-slot"><span class="slot-hint">⏳</span><span class="slot-label">Processing…</span></div>`).join(""));
+      for (const file of files) photos.push(await compressPhoto(file));
+      e.target.value = "";
+      buildUploadGrid();
+    }
+
+    function removePhoto(e, i) { e.stopPropagation(); photos.splice(i, 1); buildUploadGrid(); }
+
+    // ── GitHub API helpers ────────────────────────────────────
+    function b64decode(str) {
+      const binary = atob(str.replace(/\n/g, ""));
+      const bytes  = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    }
+
+    function b64encode(str) {
+      const bytes  = new TextEncoder().encode(str);
+      let binary = "";
+      bytes.forEach(b => binary += String.fromCharCode(b));
+      return btoa(binary);
+    }
+
+    function ghHeaders() {
+      return {
+        Authorization:  `token ${getToken()}`,
+        Accept:         "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+      };
+    }
+
+    async function ghGetEntriesJson() {
+      const { owner, repo } = CONFIG.github;
+      const res  = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/entries.json`,
+        { headers: ghHeaders() });
+      if (!res.ok) throw new Error(`GitHub error ${res.status}: ${(await res.json()).message}`);
+      const data = await res.json();
+      return { sha: data.sha, entries: JSON.parse(b64decode(data.content)) };
+    }
+
+    async function ghSaveEntriesJson(entries, sha) {
+      const { owner, repo } = CONFIG.github;
+      const content = b64encode(JSON.stringify({ entries }, null, 2));
+      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/entries.json`, {
+        method:  "PUT",
+        headers: ghHeaders(),
+        body:    JSON.stringify({ message: `Journal update ${new Date().toISOString().split("T")[0]}`, content, sha }),
+      });
+      if (!res.ok) throw new Error(`GitHub error ${res.status}: ${(await res.json()).message}`);
+    }
+
+    async function ghUploadPhoto(dataUrl, date, index) {
+      const { owner, repo } = CONFIG.github;
+      const base64   = dataUrl.split(",")[1];
+      const filename = `photos/${date}-${index + 1}-${Date.now()}.jpg`;
+      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filename}`, {
+        method:  "PUT",
+        headers: ghHeaders(),
+        body:    JSON.stringify({ message: `Add photo ${filename}`, content: base64 }),
+      });
+      if (!res.ok) throw new Error(`Photo upload failed: ${(await res.json()).message}`);
+      return `https://raw.githubusercontent.com/${owner}/${repo}/main/${filename}`;
+    }
+
+    async function ghDeleteFile(path, sha) {
+      const { owner, repo } = CONFIG.github;
+      await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+        method:  "DELETE",
+        headers: ghHeaders(),
+        body:    JSON.stringify({ message: `Remove ${path}`, sha }),
+      });
+    }
+
+    // ── Edit helpers ──────────────────────────────────────────
+    async function loadEntryForEditing(id) {
+      setProgress("Loading entry…");
+      try {
+        const { entries } = await ghGetEntriesJson();
+        const entry = entries.find(e => e.id === id);
+        if (!entry) { setProgress(""); return; }
+
+        editingId = id;
+        document.getElementById("f-date").value  = entry.date  || "";
+        document.getElementById("f-notes").value = entry.notes || "";
+        pickStage(entry.stage || "no-legs");
+
+        photos.length = 0;
+        (entry.photos || []).forEach(p => photos.push(p));
+        buildUploadGrid();
+
+        document.getElementById("edit-banner").style.display  = "flex";
+        document.getElementById("publish-btn").textContent    = "💾 Save Changes";
+        document.getElementById("ai-tip").style.display       = "none";
+        document.querySelector(".composer").scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (e) { alert("Could not load entry: " + e.message); }
+      setProgress("");
+    }
+
+    function cancelEdit() {
+      editingId = null;
+      document.getElementById("f-date").value  = new Date().toISOString().split("T")[0];
+      document.getElementById("f-notes").value = "";
+      pickStage("no-legs");
+      photos.length = 0;
+      buildUploadGrid();
+      document.getElementById("edit-banner").style.display = "none";
+      document.getElementById("publish-btn").textContent   = "🐸 Publish Entry";
+      document.getElementById("ai-tip").style.display      = "none";
+    }
+
+    // ── Publish ───────────────────────────────────────────────
+    document.getElementById("entry-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      if (!getToken()) { alert("Please connect your GitHub token first (see the connection section above)."); return; }
+
+      const btn       = document.getElementById("publish-btn");
+      const isEditing = !!editingId;
+      btn.disabled    = true;
+      btn.textContent = "Publishing…";
+
+      try {
+        const date  = document.getElementById("f-date").value;
+        const newPhotos = photos.filter(p => p.startsWith("data:"));
+        const keepUrls  = photos.filter(p => !p.startsWith("data:"));
+
+        // 1. Upload new photos
+        const uploadedUrls = [];
+        for (let i = 0; i < newPhotos.length; i++) {
+          setProgress(`Uploading photo ${i + 1} of ${newPhotos.length}…`);
+          uploadedUrls.push(await ghUploadPhoto(newPhotos[i], date, keepUrls.length + i));
+        }
+
+        const allPhotoUrls = [...keepUrls, ...uploadedUrls];
+
+        // 2. Read current entries.json + SHA
+        setProgress("Saving entry…");
+        const { sha, entries } = await ghGetEntriesJson();
+
+        // 3. Update entries array
+        const entry = {
+          id:     editingId || "entry_" + Date.now(),
+          date,
+          stage:  selectedStage,
+          notes:  document.getElementById("f-notes").value.trim(),
+          photos: allPhotoUrls,
+        };
+        const idx = entries.findIndex(en => en.id === editingId);
+        if (idx >= 0) entries[idx] = entry;
+        else          entries.push(entry);
+
+        // 4. Write back to GitHub
+        await ghSaveEntriesJson(entries, sha);
+
+        // Success
+        setProgress("");
+        cancelEdit();
+        const toast = document.getElementById("toast");
+        toast.innerHTML = isEditing
+          ? `✅ Entry updated on your website! &nbsp;<a href="index.html">View journal →</a>`
+          : `✅ Entry is live on your website! &nbsp;<a href="index.html">View journal →</a>`;
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 8000);
+        loadPastEntries();
+
+      } catch (err) {
+        setProgress("");
+        alert("Something went wrong: " + err.message + "\n\nCheck that your GitHub token is correct and has permission to write to the repository.");
+      }
+
+      btn.disabled    = false;
+      btn.textContent = editingId ? "💾 Save Changes" : "🐸 Publish Entry";
+    });
+
+    function setProgress(msg) {
+      const el = document.getElementById("upload-progress");
+      el.textContent    = msg;
+      el.style.display  = msg ? "block" : "none";
+    }
+
+    // ── Past entries ──────────────────────────────────────────
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      const [y,m,d] = iso.split("-");
+      return new Date(+y,+m-1,+d).toLocaleDateString("en-US",
+        { weekday:"short", month:"long", day:"numeric", year:"numeric" });
+    }
+
+    async function loadPastEntries() {
+      const list   = document.getElementById("admin-entries-list");
+      const header = document.getElementById("past-header");
+      if (!getToken()) { header.style.display = "none"; list.innerHTML = ""; return; }
+
+      list.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.9rem;">Loading…</div>`;
+      try {
+        const { entries } = await ghGetEntriesJson();
+        const sorted = entries.sort((a,b) => (b.date||"").localeCompare(a.date||""));
+        header.style.display = sorted.length ? "block" : "none";
+        if (!sorted.length) { list.innerHTML = ""; return; }
+
+        list.innerHTML = sorted.map(entry => {
+          const photos  = (entry.photos||[]).filter(Boolean);
+          const label   = STAGE_LABELS[entry.stage] || entry.stage;
+          const preview = entry.notes ? entry.notes.substring(0,90)+(entry.notes.length>90?"…":"") : "No notes";
+          const thumbs  = photos.length
+            ? photos.slice(0,2).map(src => `<img class="admin-thumb" src="${src}" alt="">`).join("")
+            : `<div class="admin-thumb-empty">📷</div>`;
+          return `
+            <div class="admin-entry">
+              <div class="admin-entry-thumbs">${thumbs}</div>
+              <div class="admin-entry-body">
+                <div class="admin-entry-date">${label} — ${fmtDate(entry.date)}</div>
+                <div class="admin-entry-note">${preview}</div>
+              </div>
+              <button class="edit-btn" onclick="loadEntryForEditing('${entry.id}')" title="Edit">✏️</button>
+              <button class="del-btn"  onclick="removeEntry('${entry.id}')" title="Delete">🗑️</button>
+            </div>`;
+        }).join("");
+      } catch (e) {
+        list.innerHTML = `<div style="padding:1rem;color:var(--text-muted);font-size:0.88rem;">Could not load entries: ${e.message}</div>`;
+        header.style.display = "none";
+      }
+    }
+
+    async function removeEntry(id) {
+      if (!confirm("Delete this entry from your website? This cannot be undone.")) return;
+      setProgress("Deleting…");
+      try {
+        const { sha, entries } = await ghGetEntriesJson();
+        const updated = entries.filter(e => e.id !== id);
+        await ghSaveEntriesJson(updated, sha);
+        loadPastEntries();
+      } catch (e) { alert("Could not delete: " + e.message); }
+      setProgress("");
+    }
+
+    // ── AI Writing Coach ──────────────────────────────────────
+    function buildAIPrompt() {
+      const notes = document.getElementById("f-notes").value.trim();
+      const date  = document.getElementById("f-date").value;
+      const stage = ADMIN_STAGES.find(s => s.key === selectedStage);
+      return `I'm writing a nature journal entry for our family farm's tadpole-watching project at Bay Innovation Farm in Stevensville, Maryland.
+
+Date: ${date}
+Tadpole stage: ${stage ? stage.label : selectedStage}
+
+My draft:
+"${notes || "(I haven't written anything yet — please ask me questions to help me get started!)"}"
+
+Please help me by:
+1. Asking me 3-4 specific questions that would help me add more interesting details (about the tadpoles' behavior, what my kids noticed, any changes since last time, environmental details, anything surprising).
+2. Telling me one thing that's already working well in my draft.
+3. Offering a polished version I can use or draw inspiration from.
+
+Keep the tone warm and family-friendly — this journal is shared with family and the public, including kids!`;
+    }
+
+    async function copyAIPrompt() {
+      try { await navigator.clipboard.writeText(buildAIPrompt()); } catch {}
+    }
+
+    async function getWritingHelp() {
+      await copyAIPrompt();
+      document.getElementById("ai-tip").style.display = "block";
+      window.open("https://claude.ai/new?q=" + encodeURIComponent(buildAIPrompt()), "_blank", "noopener,noreferrer");
+    }
+
+    // ── Init ──────────────────────────────────────────────────
+    buildStagePicker();
+    buildUploadGrid();
+    updateTokenUI();
+    loadPastEntries();
+  </script>
+</body>
+</html>
